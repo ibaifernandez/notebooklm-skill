@@ -1,0 +1,80 @@
+---
+description: >
+  End-of-session wrap-up: summarizes the session and pushes a log to the
+  project's linked NotebookLM notebook. Activate with @wrapup in chat, or
+  "wrap up", "save this session", or "end of session".
+alwaysApply: false
+---
+
+# Session Wrap-Up
+
+Runs at end of session to capture decisions, save context, and push a log to
+NotebookLM.
+
+---
+
+## Step 1 — Find target notebook
+
+Check for project notebook:
+
+```bash
+cat "$(pwd)/.notebooklm/config.json" 2>/dev/null
+```
+
+If found, use that notebook ID. Otherwise check `~/.notebooklm/registry.json`
+for the current path. If neither exists, ask the user to run `@notebooklm init`
+first.
+
+---
+
+## Step 2 — Review the session
+
+Look back through the conversation and identify:
+
+- **Work completed** — what was built, fixed, or configured
+- **Decisions made** — what was decided and why
+- **Key learnings** — non-obvious insights
+- **Open threads** — unfinished items for next session
+
+---
+
+## Step 3 — Write session log
+
+Create a markdown file at `.notebooklm/sessions/session-YYYY-MM-DD.md`:
+
+```markdown
+# Session Summary — YYYY-MM-DD
+
+**Project:** <project name>
+
+## What We Did
+- ...
+
+## Decisions Made
+- ...
+
+## Key Learnings
+- ...
+
+## Open Threads
+- ...
+
+## Tools & Systems Touched
+- ...
+```
+
+---
+
+## Step 4 — Push to NotebookLM
+
+```bash
+NOTEBOOK_ID=$(python3 -c "import json,pathlib; print(json.loads(pathlib.Path('.notebooklm/config.json').read_text())['notebook_id'])")
+notebooklm source add .notebooklm/sessions/session-YYYY-MM-DD.md --notebook "$NOTEBOOK_ID"
+```
+
+---
+
+## Step 5 — Confirm
+
+Tell the user: what was captured, where it was saved, and any open threads
+to pick up next time. One short paragraph.

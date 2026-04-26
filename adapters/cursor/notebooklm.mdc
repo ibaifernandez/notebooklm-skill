@@ -1,0 +1,175 @@
+---
+description: >
+  Full programmatic access to Google NotebookLM with per-project notebooks.
+  Activate by mentioning @notebooklm in chat, or with phrases like "init
+  notebooklm", "sync sources", "create a podcast about X", or "ask the notebook".
+alwaysApply: false
+---
+
+# NotebookLM Integration
+
+Programmatic access to Google NotebookLM from Cursor. Supports per-project
+notebooks, automatic source syncing, and all artifact types.
+
+---
+
+## Setup (run once, on first use)
+
+Check if the CLI is already installed:
+
+```bash
+notebooklm --version 2>/dev/null || ~/.notebooklm-venv/bin/notebooklm --version 2>/dev/null
+```
+
+If not found, run the installer from the repo root:
+
+```bash
+chmod +x install.sh && ./install.sh
+```
+
+Or manually:
+
+```bash
+# Recommended: use uv (fast, no ensurepip issues)
+uv venv ~/.notebooklm-venv --python python3.12
+uv pip install "notebooklm-py[browser]" --python ~/.notebooklm-venv/bin/python
+~/.notebooklm-venv/bin/playwright install chromium
+mkdir -p ~/bin
+ln -sf ~/.notebooklm-venv/bin/notebooklm ~/bin/notebooklm
+export PATH="$HOME/bin:$PATH"
+```
+
+### Authentication
+
+Run this script to authenticate with Google. It opens a real browser window —
+sign in and navigate to notebooklm.google.com, then run the signal command:
+
+```bash
+cat > /tmp/nlm_login.py << 'PYEOF'
+import json, time
+from pathlib import Path
+from playwright.sync_api import sync_playwright
+
+STORAGE_PATH = Path.home() / ".notebooklm" / "storage_state.json"
+PROFILE_PATH = Path.home() / ".notebooklm" / "browser_profile"
+SIGNAL_FILE  = Path("/tmp/nlm_save_signal")
+
+SIGNAL_FILE.unlink(missing_ok=True)
+STORAGE_PATH.parent.mkdir(parents=True, exist_ok=True)
+
+with sync_playwright() as p:
+    browser = p.chromium.launch_persistent_context(
+        user_data_dir=str(PROFILE_PATH),
+        headless=False,
+        args=["--disable-blink-features=AutomationControlled"],
+    )
+    page = browser.pages[0] if browser.pages else browser.new_page()
+    page.goto("https://notebooklm.google.com/")
+    print("Sign in, then run: touch /tmp/nlm_save_signal")
+    while not SIGNAL_FILE.exists():
+        time.sleep(1)
+    storage = browser.storage_state()
+    STORAGE_PATH.write_text(json.dumps(storage))
+    print(f"Saved {len(storage.get('cookies', []))} cookies to {STORAGE_PATH}")
+    browser.close()
+SIGNAL_FILE.unlink(missing_ok=True)
+PYEOF
+
+source ~/.notebooklm-venv/bin/activate && python3 /tmp/nlm_login.py &
+```
+
+Once you're on the NotebookLM home page, run in a separate terminal:
+
+```bash
+touch /tmp/nlm_save_signal
+```
+
+Verify:
+
+```bash
+notebooklm auth check && notebooklm list
+```
+
+---
+
+## Project context detection
+
+Before running notebook commands, check if this project has a linked notebook:
+
+```bash
+cat "$(pwd)/.notebooklm/config.json" 2>/dev/null
+```
+
+If found, set the active notebook:
+
+```bash
+NOTEBOOK_ID=$(python3 -c "
+import json, pathlib
+cfg = pathlib.Path('.notebooklm/config.json')
+if cfg.exists():
+    print(json.loads(cfg.read_text())['notebook_id'])
+")
+notebooklm use "$NOTEBOOK_ID"
+```
+
+---
+
+## Command: init
+
+Initialize a NotebookLM notebook for the current project.
+
+1. Create the notebook:
+   ```bash
+   notebooklm create "$(basename $(pwd))" --json
+   ```
+2. Set as active: `notebooklm use <id>`
+3. Scan for useful sources: `README.md`, `CLAUDE.md`, `docs/`, `src/content/`
+4. Add each source: `notebooklm source add ./README.md --json`
+5. Create `.notebooklm/config.json`:
+   ```json
+   {
+     "notebook_id": "<ID>",
+     "notebook_title": "<project name>",
+     "project_path": "<absolute path>",
+     "created_at": "<YYYY-MM-DD>",
+     "auto_sources": ["README.md", "docs/"],
+     "live_url": null
+   }
+   ```
+6. Update `~/.notebooklm/registry.json` with the new entry
+
+---
+
+## Command: sync
+
+Re-add all sources listed in `.notebooklm/config.json > auto_sources` and the
+`live_url` if configured. Run after adding new documentation.
+
+---
+
+## Quick reference
+
+| Task | Command |
+|------|---------|
+| List notebooks | `notebooklm list` |
+| Create notebook | `notebooklm create "Title"` |
+| Set active notebook | `notebooklm use <id>` |
+| Add file | `notebooklm source add ./file.md` |
+| Add URL | `notebooklm source add "https://..."` |
+| Chat | `notebooklm ask "question"` |
+| Generate podcast | `notebooklm generate audio "focus on X"` |
+| Generate report | `notebooklm generate report --format briefing-doc` |
+| Generate quiz | `notebooklm generate quiz` |
+| Wait for artifact | `notebooklm artifact wait <id>` |
+| Download audio | `notebooklm download audio ./output.mp3` |
+
+---
+
+## Error handling
+
+| Error | Fix |
+|-------|-----|
+| Auth/cookie error | Re-run the authentication script above |
+| No notebook context | Run init or `notebooklm use <id>` |
+| `ensurepip` hangs | Use `uv` instead (see setup above) |
+| Rate limiting | Wait 5–10 min, retry |

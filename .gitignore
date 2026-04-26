@@ -1,0 +1,25 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Auth — never commit credentials
+.notebooklm/storage_state.json
+.notebooklm/browser_profile/
+**/storage_state.json
+**/browser_profile/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# Session logs (may contain sensitive work)
+.notebooklm/sessions/
+
+# Temp
+/tmp/
+*.tmp
