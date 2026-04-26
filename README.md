@@ -331,6 +331,8 @@ Full reference: `notebooklm --help`
 
 This skill is built on top of [notebooklm-py](https://github.com/sharu725/notebooklm-py) by [@sharu725](https://github.com/sharu725) — an unofficial Python CLI for the NotebookLM web interface.
 
+The idea of wrapping `notebooklm-py` in an AI coding assistant skill was inspired by community experimentation around the library. The per-project notebook architecture, cross-platform installer, and multi-agent adapter system are original additions.
+
 **Important:** NotebookLM has no official public API. `notebooklm-py` drives the web UI via Playwright. Google may change things without warning. If something breaks, update the library:
 
 ```bash
