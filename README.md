@@ -83,13 +83,18 @@ notebooklm --version
 
 ### Claude Code
 
+Claude Code skills must be installed as **directories** containing a `SKILL.md` file:
+
 ```bash
-cp skills/notebooklm.md ~/.claude/skills/
-cp skills/wrapup.md ~/.claude/skills/
+mkdir -p ~/.claude/skills/notebooklm
+mkdir -p ~/.claude/skills/wrapup
+cp skills/notebooklm.md ~/.claude/skills/notebooklm/SKILL.md
+cp skills/wrapup.md ~/.claude/skills/wrapup/SKILL.md
 ```
 
 > Skill directory: `~/.claude/skills/` on macOS/Linux, `%USERPROFILE%\.claude\skills\` on Windows.
 > Create it if it doesn't exist: `mkdir -p ~/.claude/skills`
+> Each skill lives in its own subdirectory with a `SKILL.md` file inside — a flat `.md` file at the root will not be picked up by Claude Code.
 
 ### Cursor
 
