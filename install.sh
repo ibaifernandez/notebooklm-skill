@@ -112,7 +112,47 @@ if [ -n "$SHELL_PROFILE" ]; then
 fi
 export PATH="$BIN_DIR:$PATH"
 
-# ── 7. Verify ────────────────────────────────────────────────────────────────
+# ── 7. Install AI assistant skills ──────────────────────────────────────────
+# Locate the directory that contains this script (the repo root)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SKILLS_INSTALLED=0
+
+echo ""
+echo "→ Installing AI assistant skills..."
+
+# Claude Code — skills must live as ~/.claude/skills/<name>/SKILL.md
+CLAUDE_SKILLS_DIR="$HOME/.claude/skills"
+if [ -d "$HOME/.claude" ] || command -v claude &>/dev/null; then
+  mkdir -p "$CLAUDE_SKILLS_DIR/notebooklm"
+  mkdir -p "$CLAUDE_SKILLS_DIR/wrapup"
+  cp "$SCRIPT_DIR/skills/notebooklm.md" "$CLAUDE_SKILLS_DIR/notebooklm/SKILL.md"
+  cp "$SCRIPT_DIR/skills/wrapup.md"     "$CLAUDE_SKILLS_DIR/wrapup/SKILL.md"
+  echo "  Claude Code skills installed → $CLAUDE_SKILLS_DIR ✓"
+  SKILLS_INSTALLED=1
+else
+  echo "  Claude Code not detected — skipping (install manually if needed)"
+fi
+
+# OpenAI Codex — same directory structure: ~/.codex/skills/<name>/SKILL.md
+CODEX_SKILLS_DIR="$HOME/.codex/skills"
+if [ -d "$HOME/.codex" ]; then
+  mkdir -p "$CODEX_SKILLS_DIR/notebooklm"
+  mkdir -p "$CODEX_SKILLS_DIR/wrapup"
+  cp "$SCRIPT_DIR/adapters/codex/notebooklm.md" "$CODEX_SKILLS_DIR/notebooklm/SKILL.md"
+  cp "$SCRIPT_DIR/adapters/codex/wrapup.md"     "$CODEX_SKILLS_DIR/wrapup/SKILL.md"
+  echo "  OpenAI Codex skills installed → $CODEX_SKILLS_DIR ✓"
+  SKILLS_INSTALLED=1
+else
+  echo "  OpenAI Codex not detected — skipping (install manually if needed)"
+fi
+
+if [ "$SKILLS_INSTALLED" -eq 0 ]; then
+  echo ""
+  echo "  ⚠  No AI assistant detected automatically."
+  echo "  Install skills manually — see README.md → Step 2."
+fi
+
+# ── 8. Verify ────────────────────────────────────────────────────────────────
 echo ""
 echo "→ Verifying installation..."
 VERSION=$(notebooklm --version 2>&1)
@@ -126,14 +166,18 @@ echo "╚═══════════════════════�
 echo ""
 echo "Next step: authenticate with Google."
 echo ""
-echo "In Claude Code, open any project and run:"
+echo "If you use Claude Code, open any project and run:"
 echo "  /notebooklm"
 echo ""
 echo "Claude will open a browser window for Google login."
 echo "Once you're on notebooklm.google.com, confirm to Claude"
-echo "and it will capture the session automatically."
+echo "and it will save the session automatically."
 echo ""
-echo "To restart your shell and get notebooklm on PATH:"
+echo "If you use Cursor, copy the adapter files manually:"
+echo "  mkdir -p .cursor/rules"
+echo "  cp $SCRIPT_DIR/adapters/cursor/*.mdc .cursor/rules/"
+echo ""
+echo "To reload your shell (so notebooklm is on PATH):"
 if [ -n "$SHELL_PROFILE" ]; then
   echo "  source $SHELL_PROFILE"
 fi
