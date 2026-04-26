@@ -1,5 +1,14 @@
 # notebooklm-skill
 
+> Give your AI coding assistant a NotebookLM brain
+
+![notebooklm-skill](images/og-image.jpeg)
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-native-black?logo=anthropic)](https://claude.ai/code)
+[![Cursor](https://img.shields.io/badge/Cursor-adapter-1a1a1a)](adapters/cursor/)
+[![OpenAI Codex](https://img.shields.io/badge/OpenAI%20Codex-adapter-412991)](adapters/codex/)
+
 Give your AI coding assistant full programmatic access to Google NotebookLM — with **per-project notebooks** that automatically link to your codebase and a **session wrap-up** that saves searchable logs over time.
 
 Works with Claude Code, Cursor, and other AI coding assistants that support instruction files or custom rules.
@@ -194,6 +203,8 @@ Cookies expire after a few days. Re-run the login flow whenever `notebooklm auth
 
 **Cursor:** `@notebooklm init this project`
 
+**OpenAI Codex:** `/notebooklm init`
+
 **Manual:**
 ```bash
 cd your-project
@@ -214,12 +225,12 @@ notebooklm use <ID>
 notebooklm source add README.md
 ```
 
-Your AI assistant (Claude Code or Cursor) handles all of this automatically when you use the init command. The manual steps are shown here so you understand what's happening and can use the CLI directly if you prefer.
+Your AI assistant (Claude Code, Cursor, or Codex) handles all of this automatically when you use the init command. The manual steps are shown here so you understand what's happening and can use the CLI directly if you prefer.
 
 ### Ask questions about your project
 
 ```
-# In Claude Code:
+# In Claude Code or Codex:
 /notebooklm
 > What are the main architectural decisions in this codebase?
 
@@ -245,8 +256,8 @@ Artifact types: `audio` (podcast), `video`, `report`, `quiz`, `flashcards`, `sli
 ### Sync sources after changes
 
 ```bash
-# Claude Code:    /notebooklm sync
-# Cursor:         @notebooklm sync sources
+# Claude Code / Codex:   /notebooklm sync
+# Cursor:                @notebooklm sync sources
 # Direct CLI:
 notebooklm source add ./docs/new-doc.md
 ```
@@ -254,8 +265,8 @@ notebooklm source add ./docs/new-doc.md
 ### End-of-session wrap-up
 
 ```
-# Claude Code:    /wrapup
-# Cursor:         @wrapup
+# Claude Code / Codex:   /wrapup
+# Cursor:                @wrapup
 ```
 
 Saves memories, writes a session log, and pushes it to the project's notebook.
