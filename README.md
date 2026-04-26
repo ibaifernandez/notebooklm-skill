@@ -329,7 +329,7 @@ Full reference: `notebooklm --help`
 
 ## Built on
 
-This skill is built on top of [notebooklm-py](https://github.com/sharu725/notebooklm-py) by [@sharu725](https://github.com/sharu725) — an unofficial Python CLI for the NotebookLM web interface.
+This skill is built on top of [notebooklm-py](https://github.com/teng-lin/notebooklm-py) by [@teng-lin](https://github.com/teng-lin) — an unofficial Python CLI for the NotebookLM web interface.
 
 The idea of wrapping `notebooklm-py` in an AI coding assistant skill was inspired by community experimentation around the library. The per-project notebook architecture, cross-platform installer, and multi-agent adapter system are original additions.
 
