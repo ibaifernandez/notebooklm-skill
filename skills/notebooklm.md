@@ -334,6 +334,26 @@ Re-sync sources from the project to its notebook, based on `auto_sources` in
 
 ---
 
+## Language handling
+
+Before any `generate` command, if `--language` is not already in the request:
+
+1. **Detect** language from the user's message:
+   - Spanish (any `es-*` variant) → `es`
+   - Brazilian Portuguese → `pt-BR`
+   - European Portuguese → `pt-PT`
+   - English (default) → `en`
+   - Other → appropriate BCP 47 code
+
+2. **Confirm** before generating — example:
+   > Generating in Spanish (`--language es`) — OK? Or tell me another language.
+
+3. **Apply** `--language <code>` to the generate command once confirmed or unopposed.
+
+If the user already specifies a language in their message ("in English", "en español", "em português"), skip confirmation and use that language directly.
+
+---
+
 ## Quick reference
 
 | Task | Command |

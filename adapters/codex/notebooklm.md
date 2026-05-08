@@ -157,6 +157,26 @@ PYEOF
 
 ---
 
+## Language handling
+
+Before any `generate` command, if `--language` is not already in the request:
+
+1. **Detect** language from the user's message:
+   - Spanish (any `es-*` variant) → `es`
+   - Brazilian Portuguese → `pt-BR`
+   - European Portuguese → `pt-PT`
+   - English (default) → `en`
+   - Other → appropriate BCP 47 code
+
+2. **Confirm** before generating — example:
+   > Generating in Spanish (`--language es`) — OK? Or tell me another language.
+
+3. **Apply** `--language <code>` to the generate command once confirmed or unopposed.
+
+If the user already specifies a language ("in English", "en español", "em português"), skip confirmation and use it directly.
+
+---
+
 ## Quick reference
 
 | Task | Command |
